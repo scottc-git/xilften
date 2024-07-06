@@ -2,8 +2,14 @@ provider "aws" {
   region = "us-west-2"
 }
 
+resource "random_string" "bucket_suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "my-terraform-state-bucket"
+  bucket = "my-terraform-state-bucket-${random_string.bucket_suffix.result}"
 
   lifecycle {
     prevent_destroy = true
