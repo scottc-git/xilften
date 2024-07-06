@@ -2,20 +2,8 @@ provider "aws" {
   region = "us-west-2"
 }
 
-resource "random_string" "bucket_suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
-resource "random_string" "dynamodb_suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "my-terraform-state-bucket-${random_string.bucket_suffix.result}"
+  bucket = "terraform-state-bucket-netflix"
 
   lifecycle {
     prevent_destroy = true
@@ -48,7 +36,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "terraform-lock-table-${random_string.dynamodb_suffix.result}"
+  name         = "terraform-lock-table-netfix"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
