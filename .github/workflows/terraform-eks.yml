@@ -42,7 +42,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          path: eks-plan-output.txt
+          path: ./terraform/eks/eks-plan-output.txt
 
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
