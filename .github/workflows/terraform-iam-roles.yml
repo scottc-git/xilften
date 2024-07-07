@@ -33,18 +33,19 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: ./terraform/iam-roles-setup
 
-      - name: Save Outputs
-        id: save_outputs
+      - name: Set Outputs and Trigger Dispatch
+        id: trigger-dispatch
         run: |
-          mkdir -p ./terraform/iam-roles-setup
-          echo "eks_node_group_role_arn=$(terraform output -raw eks_node_group_role_arn)" > ./terraform/iam-roles-setup/eks_node_group_role_arn.txt
-          echo "github_actions_role_arn=$(terraform output -raw github_actions_role_arn)" > ./terraform/iam-roles-setup/github_actions_role_arn.txt
-
-      - name: Upload Outputs Artifact
-        uses: actions/upload-artifact@v4
+          echo "::set-output name=eks_node_group_role_arn::$(terraform output -raw eks_node_group_role_arn)"
+          echo "::set-output name=github_actions_role_arn::$(terraform output -raw github_actions_role_arn)"
+      
+      - name: Trigger EKS Deploy Workflow
+        uses: peter-evans/repository-dispatch@v3
         with:
-          name: iam-role-arns
-          path: ./terraform/iam-roles-setup/*.txt
-
-      - name: List Uploaded Artifacts
-        run: ls -lR ./terraform/iam-roles-setup
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          event-type: eks-deploy
+          client-payload: |
+            {
+              "eks_node_group_role_arn": "${{ steps.trigger-dispatch.outputs.eks_node_group_role_arn }}",
+              "github_actions_role_arn": "${{ steps.trigger-dispatch.outputs.github_actions_role_arn }}"
+            }

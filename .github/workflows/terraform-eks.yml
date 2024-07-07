@@ -1,10 +1,8 @@
 name: EKS Deploy
 
 on:
-  workflow_run:
-    workflows: ["IAM Roles Setup"]
-    types:
-      - completed
+  repository_dispatch:
+    types: [eks-deploy]
   pull_request:
     branches:
       - '*'
@@ -20,31 +18,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create Artifacts Directory
-        run: mkdir -p ./artifacts
-        
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: iam-role-arns
-          path: ./artifacts
-      - name: List Available Artifacts
+      - name: Parse Dispatch Data
         run: |
-          echo "Listing artifacts available for download"
-          echo "Available artifacts:"
-          ls -lR ./artifacts
-  
-
-      - name: Set Environment Variables
-        run: |
-          echo "github_actions_role_arn=$(cat ./artifacts/github_actions_role_arn.txt)" >> $GITHUB_ENV
-          echo "eks_node_group_role_arn=$(cat ./artifacts/eks_node_group_role_arn.txt)" >> $GITHUB_ENV
-
+          echo "EKS_NODE_GROUP_ROLE_ARN=${{ github.event.client_payload.eks_node_group_role_arn }}" >> $GITHUB_ENV
+          echo "GITHUB_ACTIONS_ROLE_ARN=${{ github.event.client_payload.github_actions_role_arn }}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.github_actions_role_arn }}
+          role-to-assume: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
           aws-region: us-west-2
           role-session-name: github-actions
 
@@ -71,7 +53,7 @@ jobs:
 
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -var "eks_node_group_role_arn=${{ env.eks_node_group_role_arn }}"
+        run: terraform apply -auto-approve -var "eks_node_group_role_arn=${{ env.EKS_NODE_GROUP_ROLE_ARN }}"
         working-directory: ./terraform/eks
 
       - name: Save Outputs
@@ -90,7 +72,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.github_actions_role_arn }}
+          role-to-assume: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
           aws-region: us-west-2
           role-session-name: github-actions
 
@@ -114,12 +96,12 @@ jobs:
             namespace: kube-system
             data:
             mapRoles: |
-                - rolearn: ${{ env.eks_node_group_role_arn }}
+                - rolearn: ${{ env.EKS_NODE_GROUP_ROLE_ARN }}
                 username: system:node:{{EC2PrivateDNSName}}
                 groups:
                     - system:bootstrappers
                     - system:nodes
-                - rolearn: ${{ env.github_actions_role_arn }}
+                - rolearn: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
                 username: github-actions
                 groups:
                     - system:masters
