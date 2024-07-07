@@ -103,11 +103,21 @@ module "github_actions_iam" {
           "dynamodb:GetItem",
           "dynamodb:DeleteItem",
           "dynamodb:Scan",
-          "dynamodb:UpdateItem"
+          "dynamodb:UpdateItem",
+          "iam:GetRole",
+          "iam:ListAttachedRolePolicies",
+          "iam:GetPolicy",
+          "iam:GetOpenIDConnectProvider"
         ],
         Resource = [
           "arn:aws:s3:::terraform-state-bucket-netflix/*",
-          "arn:aws:dynamodb:us-west-2:${data.aws_caller_identity.current.account_id}:table/terraform-lock-table-netflix"
+          "arn:aws:dynamodb:us-west-2:${data.aws_caller_identity.current.account_id}:table/terraform-lock-table-netflix",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/eks-node-group-role",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-role",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/eks-node-group-policy",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/github-actions-policy",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+
         ]
       }
     ]
