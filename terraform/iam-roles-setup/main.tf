@@ -12,6 +12,8 @@ terraform {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 module "eks_node_group_iam" {
   source = "../modules/iam-roles"
 
