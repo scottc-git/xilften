@@ -33,6 +33,9 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: ./terraform/iam-roles-setup
 
+      - name: Create Output Directory
+        run: mkdir -p ./terraform/iam-roles-setup  
+
       - name: Save Outputs
         id: save_outputs
         run: |
