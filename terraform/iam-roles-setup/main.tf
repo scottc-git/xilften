@@ -61,9 +61,15 @@ module "github_actions_iam" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "ec2.amazonaws.com"
+          Federated : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
         },
-        Action = "sts:AssumeRole"
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition : {
+          StringEquals : {
+            "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com",
+            "token.actions.githubusercontent.com:sub" : "repo:scottc-git/xilften:ref:refs/heads/main"
+          }
+        }
       }
     ]
   })
@@ -76,7 +82,8 @@ module "github_actions_iam" {
         Action = [
           "eks:DescribeCluster",
           "eks:ListClusters",
-          "eks:AccessKubernetesApi"
+          "eks:AccessKubernetesApi",
+          "sts:AssumeRole"
         ],
         Resource = "*"
       }
