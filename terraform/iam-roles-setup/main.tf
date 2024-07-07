@@ -91,7 +91,7 @@ module "github_actions_iam" {
       {
         Effect = "Allow",
         Action = [
-           # EKS
+          # EKS
           "eks:DescribeCluster",
           "eks:ListClusters",
           "eks:AccessKubernetesApi",
@@ -101,11 +101,13 @@ module "github_actions_iam" {
           "iam:ListAttachedRolePolicies",
           "iam:GetPolicy",
           "iam:GetPolicyVersion",
+          "iam:ListPolicyVersions",
           "iam:ListRolePolicies",
           "iam:GetOpenIDConnectProvider",
           "iam:ListOpenIDConnectProviders",
           "iam:DetachRolePolicy",
           "iam:CreateRole",
+          "iam:ListInstanceProfilesForRole",
           
           # S3
           "s3:GetObject",
@@ -123,6 +125,7 @@ module "github_actions_iam" {
           # CloudWatch Logs
           "logs:CreateLogGroup",
           "logs:PutRetentionPolicy",
+          "logs:TagResource",
 
           # EC2
           "ec2:CreateVpc",
@@ -139,7 +142,8 @@ module "github_actions_iam" {
           "ec2:CreateNatGateway",
           "ec2:DescribeNatGateways",
           "ec2:AllocateAddress",
-          "ec2:DescribeAddresses"
+          "ec2:DescribeAddresses",
+          "ec2:CreateTags"
         ],
         Resource = [
           "arn:aws:s3:::terraform-state-bucket-netflix/*",
