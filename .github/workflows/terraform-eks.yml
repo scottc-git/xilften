@@ -2,7 +2,7 @@ name: EKS Deploy
 
 on:
   repository_dispatch:
-    types: [eks-deploy]
+    types: [iam-roles-updated]
   pull_request:
     branches:
       - '*'

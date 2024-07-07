@@ -36,16 +36,16 @@ jobs:
       - name: Set Outputs and Trigger Dispatch
         id: trigger-dispatch
         run: |
-          echo "::set-output name=eks_node_group_role_arn::$(terraform output -raw eks_node_group_role_arn)"
-          echo "::set-output name=github_actions_role_arn::$(terraform output -raw github_actions_role_arn)"
+          echo "EKS_NODE_GROUP_ROLE_ARN=$(terraform output -raw eks_node_group_role_arn)" >> $GITHUB_ENV
+          echo "GITHUB_ACTIONS_ROLE_ARN=$(terraform output -raw github_actions_role_arn)" >> $GITHUB_ENV
       
       - name: Trigger EKS Deploy Workflow
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.MY_GITHUB_TOKEN }}
-          event-type: eks-deploy
-          client-payload: |
+          event-type: iam-roles-updated
+          client-payload: |-
             {
-              "eks_node_group_role_arn": "${{ steps.trigger-dispatch.outputs.eks_node_group_role_arn }}",
-              "github_actions_role_arn": "${{ steps.trigger-dispatch.outputs.github_actions_role_arn }}"
+              "eks_node_group_role_arn": "${{ env.EKS_NODE_GROUP_ROLE_ARN }}",
+              "github_actions_role_arn": "${{ env.GITHUB_ACTIONS_ROLE_ARN }}"
             }
