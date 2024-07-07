@@ -91,25 +91,55 @@ module "github_actions_iam" {
       {
         Effect = "Allow",
         Action = [
+           # EKS
           "eks:DescribeCluster",
           "eks:ListClusters",
           "eks:AccessKubernetesApi",
-          "sts:AssumeRole",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket",
-          "dynamodb:PutItem",
-          "dynamodb:GetItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:Scan",
-          "dynamodb:UpdateItem",
+          
+          # IAM
           "iam:GetRole",
           "iam:ListAttachedRolePolicies",
           "iam:GetPolicy",
           "iam:GetPolicyVersion",
           "iam:ListRolePolicies",
-          "iam:GetOpenIDConnectProvider"
+          "iam:GetOpenIDConnectProvider",
+          "iam:ListOpenIDConnectProviders",
+          "iam:DetachRolePolicy",
+          "iam:CreateRole",
+          
+          # S3
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
+          
+          # DynamoDB
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+
+          # CloudWatch Logs
+          "logs:CreateLogGroup",
+          "logs:PutRetentionPolicy",
+
+          # EC2
+          "ec2:CreateVpc",
+          "ec2:DeleteVpc",
+          "ec2:DescribeVpcs",
+          "ec2:CreateInternetGateway",
+          "ec2:AttachInternetGateway",
+          "ec2:CreateRouteTable",
+          "ec2:CreateRoute",
+          "ec2:DescribeRouteTables",
+          "ec2:AssociateRouteTable",
+          "ec2:CreateSubnet",
+          "ec2:DescribeSubnets",
+          "ec2:CreateNatGateway",
+          "ec2:DescribeNatGateways",
+          "ec2:AllocateAddress",
+          "ec2:DescribeAddresses"
         ],
         Resource = [
           "arn:aws:s3:::terraform-state-bucket-netflix/*",
@@ -118,8 +148,10 @@ module "github_actions_iam" {
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-role",
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/eks-node-group-policy",
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/github-actions-policy",
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
-
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com",
+          "arn:aws:ec2:us-west-2:${data.aws_caller_identity.current.account_id}:elastic-ip/*",
+          "arn:aws:ec2:us-west-2:${data.aws_caller_identity.current.account_id}:vpc/*",
+          "arn:aws:logs:us-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/my-netflix-eks/*"
         ]
       }
     ]
