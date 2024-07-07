@@ -33,12 +33,10 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: ./terraform/iam-roles-setup
 
-      - name: Create Output Directory
-        run: mkdir -p ./terraform/iam-roles-setup  
-
       - name: Save Outputs
         id: save_outputs
         run: |
+          mkdir -p ./terraform/iam-roles-setup
           echo "eks_node_group_role_arn=$(terraform output -raw eks_node_group_role_arn)" > ./terraform/iam-roles-setup/eks_node_group_role_arn.txt
           echo "github_actions_role_arn=$(terraform output -raw github_actions_role_arn)" > ./terraform/iam-roles-setup/github_actions_role_arn.txt
         working-directory: ./terraform/iam-roles-setup
