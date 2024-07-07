@@ -13,6 +13,8 @@ terraform {
 }
 # https://github.com/terraform-aws-modules/terraform-aws-vpc?tab=readme-ov-file#external-nat-gateway-ips
 resource "aws_eip" "nat" {
+  count = 3
+  vpc = true
   domain = "vpc"
 }
 
