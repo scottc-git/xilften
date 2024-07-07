@@ -10,6 +10,13 @@ on:
     branches:
       - main
 
+env:
+    AWS_REGION: us-west-2      
+
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
 jobs:
   create_eks_cluster:
     runs-on: ubuntu-latest
@@ -28,7 +35,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
-          aws-region: us-west-2
+          aws-region: ${{ env.AWS_REGION }}
           role-session-name: github-actions
 
       - name: Set up Terraform
@@ -74,7 +81,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
-          aws-region: us-west-2
+          aws-region: ${{ env.AWS_REGION }}
           role-session-name: github-actions
 
       - name: Set up kubectl
@@ -85,7 +92,7 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-            aws eks update-kubeconfig --name ${{ env.eks_cluster_name }} --region us-west-2
+            aws eks update-kubeconfig --name ${{ env.eks_cluster_name }} --region ${{ env.AWS_REGION }}
 
       - name: Apply aws-auth ConfigMap
         run: |
