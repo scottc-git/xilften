@@ -47,3 +47,6 @@ jobs:
           path: |
             eks_node_group_role_arn.txt
             github_actions_role_arn.txt
+
+      - name: List Uploaded Artifacts
+        run: ls -lR ./terraform/iam-roles-setup            
