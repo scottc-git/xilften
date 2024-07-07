@@ -36,17 +36,15 @@ jobs:
       - name: Save Outputs
         id: save_outputs
         run: |
-          echo "eks_node_group_role_arn=$(terraform output -raw eks_node_group_role_arn)" >> eks_node_group_role_arn.txt
-          echo "github_actions_role_arn=$(terraform output -raw github_actions_role_arn)" >> github_actions_role_arn.txt
+          echo "eks_node_group_role_arn=$(terraform output -raw eks_node_group_role_arn)" > ./terraform/iam-roles-setup/eks_node_group_role_arn.txt
+          echo "github_actions_role_arn=$(terraform output -raw github_actions_role_arn)" > ./terraform/iam-roles-setup/github_actions_role_arn.txt
         working-directory: ./terraform/iam-roles-setup
 
       - name: Upload Outputs Artifact
         uses: actions/upload-artifact@v4
         with:
           name: iam-role-arns
-          path: |
-            eks_node_group_role_arn.txt
-            github_actions_role_arn.txt
+          path: ./terraform/iam-roles-setup/*.txt
 
       - name: List Uploaded Artifacts
-        run: ls -lR ./terraform/iam-roles-setup            
+        run: ls -lR ./terraform/iam-roles-setup
