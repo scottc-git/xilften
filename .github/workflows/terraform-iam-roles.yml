@@ -38,7 +38,8 @@ jobs:
         run: |
           echo "EKS_NODE_GROUP_ROLE_ARN=$(terraform output -raw eks_node_group_role_arn)" >> $GITHUB_ENV
           echo "GITHUB_ACTIONS_ROLE_ARN=$(terraform output -raw github_actions_role_arn)" >> $GITHUB_ENV
-      
+        working-directory: ./terraform/iam-roles-setup
+        
       - name: Trigger EKS Deploy Workflow
         uses: peter-evans/repository-dispatch@v3
         with:
