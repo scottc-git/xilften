@@ -20,17 +20,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: List Available Artifacts
-        run: |
-          echo "Listing artifacts available for download"
-          echo "Available artifacts:"
-          ls -lR ./artifacts
+      - name: Create Artifacts Directory
+        run: mkdir -p ./artifacts
         
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: iam-role-arns
           path: ./artifacts
+      - name: List Available Artifacts
+        run: |
+          echo "Listing artifacts available for download"
+          echo "Available artifacts:"
+          ls -lR ./artifacts
+  
 
       - name: Set Environment Variables
         run: |
