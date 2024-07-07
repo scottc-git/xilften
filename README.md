@@ -37,7 +37,7 @@
 - Clone your application's code repository onto the EC2 instance:
     
     ```bash
-    git clone https://github.com/N4si/DevSecOps-Project.git
+    git clone https://github.com/scottc-git/xilften.git
     ```
     
 
@@ -145,7 +145,10 @@ docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
     - Access Jenkins in a web browser using the public IP of your EC2 instance.
         
         publicIp:8080
-        
+    - Admin Password
+
+    `sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
+
 2. **Install Necessary Plugins in Jenkins:**
 
 Goto Manage Jenkins →Plugins → Available Plugins →
@@ -204,7 +207,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
+                git branch: 'main', url: 'https://github.com/scottc-git/xilften.git'
             }
         }
         stage("Sonarqube Analysis") {
@@ -285,6 +288,8 @@ pipeline{
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
+        NVD_API_KEY = credentials('nvd-api-key')
+        TMDB_V3_API_KEY = credentials('tmdb-api-key')
     }
     stages {
         stage('clean workspace'){
@@ -294,14 +299,17 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
+                git branch: 'main', url: 'https://github.com/scottc-git/xilften.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
-                    -Dsonar.projectKey=Netflix '''
+                    sh ''' 
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=Netflix \
+                        -Dsonar.projectKey=Netflix
+                    '''
                 }
             }
         }
@@ -319,7 +327,7 @@ pipeline{
         }
         stage('OWASP FS SCAN') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: "--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey $NVD_API_KEY", odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
@@ -331,29 +339,31 @@ pipeline{
         stage("Docker Build & Push"){
             steps{
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build --build-arg TMDB_V3_API_KEY=<yourapikey> -t netflix ."
-                       sh "docker tag netflix nasi101/netflix:latest "
-                       sh "docker push nasi101/netflix:latest "
+                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
+                        sh '''
+                            docker build --build-arg TMDB_V3_API_KEY=${env.TMDB_V3_API_KEY} -t netflix .
+                            docker tag netflix buhrekcod8/netflix:latest
+                            docker push buhrekcod8/netflix:latest
+                        '''
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image nasi101/netflix:latest > trivyimage.txt" 
+                sh "trivy image buhrekcod8/netflix:latest > trivyimage.txt" 
             }
         }
         stage('Deploy to container'){
             steps{
-                sh 'docker run -d --name netflix -p 8081:80 nasi101/netflix:latest'
+                sh 'docker run -d --name netflix -p 8081:80 buhrekcod8/netflix:latest'
             }
         }
     }
 }
 
 
-If you get docker login failed errorr
+If you get docker login failed errorr.  <<== SC: this was absolutely needed!!
 
 sudo su
 sudo usermod -aG docker jenkins
