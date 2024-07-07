@@ -20,6 +20,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: iam-role-arns
+          path: ./artifacts
+
+      - name: Set Environment Variables
+        run: |
+          echo "github_actions_role_arn=$(cat ./artifacts/github_actions_role_arn.txt)" >> $GITHUB_ENV
+          echo "eks_node_group_role_arn=$(cat ./artifacts/eks_node_group_role_arn.txt)" >> $GITHUB_ENV
+
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
