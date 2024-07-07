@@ -21,6 +21,7 @@ resource "aws_iam_openid_connect_provider" "github" {
   thumbprint_list = ["a031c46782e6e6c662c2c87c76da9aa62ccabd8e"]
 }
 
+# EKS Node Group IAM Role
 module "eks_node_group_iam" {
   source = "../modules/iam-roles"
 
@@ -60,6 +61,7 @@ module "eks_node_group_iam" {
   })
 }
 
+# GitHub Actions IAM Role
 module "github_actions_iam" {
   source = "../modules/iam-roles"
 
@@ -92,9 +94,21 @@ module "github_actions_iam" {
           "eks:DescribeCluster",
           "eks:ListClusters",
           "eks:AccessKubernetesApi",
-          "sts:AssumeRole"
+          "sts:AssumeRole",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem"
         ],
-        Resource = "*"
+        Resource = [
+          "arn:aws:s3:::terraform-state-bucket-netflix/*",
+          "arn:aws:dynamodb:us-west-2:${data.aws_caller_identity.current.account_id}:table/terraform-lock-table-netflix"
+        ]
       }
     ]
   })
