@@ -60,11 +60,12 @@ jobs:
           path: ./terraform/eks/eks-plan-output.txt
 
       - name: Terraform Apply
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'repository_dispatch'
         run: terraform apply -auto-approve -var "eks_node_group_role_arn=${{ env.EKS_NODE_GROUP_ROLE_ARN }}"
         working-directory: ./terraform/eks
 
       - name: Save Outputs
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'repository_dispatch'
         id: save_outputs
         run: |
           echo "eks_cluster_name=$(terraform output -raw eks_cluster_name)" >> $GITHUB_ENV
