@@ -107,6 +107,8 @@ module "github_actions_iam" {
           "iam:GetRole",
           "iam:ListAttachedRolePolicies",
           "iam:GetPolicy",
+          "iam:GetPolicyVersion",
+          "iam:ListRolePolicies",
           "iam:GetOpenIDConnectProvider"
         ],
         Resource = [
