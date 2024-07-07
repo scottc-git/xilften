@@ -93,10 +93,10 @@ module "github_actions_iam" {
         Action = [
           # IAM
           "iam:*",
-          
+
           # S3
           "s3:*",
-          
+
           # DynamoDB
           "dynamodb:*",
 
@@ -108,6 +108,9 @@ module "github_actions_iam" {
 
           # EKS
           "eks:*",
+
+          # KMS
+          "kms:*",
 
           # STS
           "sts:AssumeRole"
