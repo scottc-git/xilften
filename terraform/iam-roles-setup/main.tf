@@ -2,6 +2,16 @@ provider "aws" {
   region = var.region
 }
 
+terraform {
+  backend "s3" {
+    bucket         = "terraform-state-bucket-netflix"
+    key            = "terraform/eks/terraform.tfstate"
+    region         = "us-west-2"
+    dynamodb_table = "terraform-lock-table-netflix"
+    encrypt        = true
+  }
+}
+
 module "eks_node_group_iam" {
   source = "../modules/iam-roles"
 
