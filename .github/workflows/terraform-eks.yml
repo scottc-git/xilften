@@ -166,4 +166,4 @@ jobs:
 
       - name: Apply aws-auth ConfigMap
         run: |
-            kubectl get pods -o wide
+            kubectl get cm aws-auth -n kube-system -o yaml
