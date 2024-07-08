@@ -21,6 +21,12 @@ terraform {
   }
 }
 
+# Reference the existing OIDC provider
+data "aws_iam_openid_connect_provider" "github" {
+  arn = "arn:aws:iam::767397667217:oidc-provider/token.actions.githubusercontent.com"
+}
+
+
 # https://github.com/terraform-aws-modules/terraform-aws-vpc?tab=readme-ov-file#external-nat-gateway-ips
 resource "aws_eip" "nat" {
   count  = 3
