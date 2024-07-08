@@ -78,6 +78,11 @@ jobs:
       -  name: Checkout code
          uses: actions/checkout@v4
 
+      - name: Parse Dispatch Data
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "GITHUB_ACTIONS_ROLE_ARN=${{ github.event.client_payload.github_actions_role_arn }}" >> $GITHUB_ENV
+ 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
