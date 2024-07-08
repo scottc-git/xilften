@@ -120,9 +120,8 @@ jobs:
                   username: github-actions-bot-for-k8s
                   groups:
                     - github-actions-group-for-k8s
-              mapUsers: |
-                - userarn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:user/administrator
-                  username: aws-admin-mapped-for-k8s
+                - rolearn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:group/my-aws-admin-group
+                  username: aws-admin-group-mapped-for-k8s
                   groups:
                     - system:masters
 
@@ -165,6 +164,3 @@ jobs:
           EOF
           kubectl apply -f rbac.yaml
 
-      - name: Test
-        run: |
-            kubectl get cm aws-auth -n kube-system -o yaml
