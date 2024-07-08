@@ -3,6 +3,15 @@ provider "aws" {
 }
 
 terraform {
+  required_version = ">= 1.3.2"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.57"
+    }
+  }
+
   backend "s3" {
     bucket         = "terraform-state-bucket-netflix"
     key            = "terraform/eks/terraform.tfstate"
@@ -45,7 +54,7 @@ module "vpc" {
 # Create EKS Cluster
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.17.2"
+  version = "~> 20.0"
 
   cluster_name    = "my-netflix-eks"
   cluster_version = "1.30"
@@ -58,6 +67,10 @@ module "eks" {
     kube-proxy             = {}
     vpc-cni                = {}
   }
+
+  # Cluster access entry
+  # To add the current caller identity as an administrator
+  enable_cluster_creator_admin_permissions = true
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
