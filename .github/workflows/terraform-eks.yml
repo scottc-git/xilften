@@ -106,13 +106,13 @@ jobs:
             apiVersion: v1
             kind: ConfigMap
             metadata:
-            name: aws-auth
-            namespace: kube-system
+              name: aws-auth
+              namespace: kube-system
             data:
-            mapRoles: |
+              mapRoles: |
                 - rolearn: ${{ env.EKS_NODE_GROUP_ROLE_ARN }}
-                username: system:node:{{EC2PrivateDNSName}}
-                groups:
+                  username: system:node:{{EC2PrivateDNSName}}
+                  groups:
                     - system:bootstrappers
                     - system:nodes
                 # - rolearn: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
