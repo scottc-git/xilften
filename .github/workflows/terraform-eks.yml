@@ -116,9 +116,9 @@ jobs:
                     - system:bootstrappers
                     - system:nodes
                 - rolearn: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
-                  username: github-actions-bot-for-k8s # a k8s user the IAM role gets map to
+                  username: github-actions-bot-for-k8s
                   groups:
-                      - github-actions-group-for-k8s # it's undefined and it is okay as we are going to use the username in below RBAC configuration.
+                    - github-actions-group-for-k8s
               mapUsers: |
                 - userarn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:user/administrator
                   username: aws-admin-mapped-for-k8s
