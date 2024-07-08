@@ -81,6 +81,7 @@ jobs:
       - name: Parse Dispatch Data
         if: github.event_name == 'repository_dispatch'
         run: |
+          echo "EKS_NODE_GROUP_ROLE_ARN=${{ github.event.client_payload.eks_node_group_role_arn }}" >> $GITHUB_ENV
           echo "GITHUB_ACTIONS_ROLE_ARN=${{ github.event.client_payload.github_actions_role_arn }}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
@@ -102,7 +103,7 @@ jobs:
 
       - name: Apply aws-auth ConfigMap
         run: |
-            cat <<EOF >aws-auth-cm.yaml
+            cat <<EOF > aws-auth-cm.yaml
             apiVersion: v1
             kind: ConfigMap
             metadata:
@@ -130,7 +131,7 @@ jobs:
 
       - name: Apply RBAC Configuration
         run: |
-          cat <<EOF >rbac.yaml
+          cat <<EOF > rbac.yaml
           apiVersion: rbac.authorization.k8s.io/v1
           kind: ClusterRole
           metadata:
@@ -164,6 +165,6 @@ jobs:
           EOF
           kubectl apply -f rbac.yaml
 
-      - name: Apply aws-auth ConfigMap
+      - name: Test
         run: |
             kubectl get cm aws-auth -n kube-system -o yaml
