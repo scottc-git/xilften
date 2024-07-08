@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "EKS_CLUSTER_NAME=$(terraform output -raw eks_cluster_name)" >> $GITHUB_ENV
         working-directory: ./terraform/eks
-        
+
   apply_aws_auth_configmap:
     needs: create_eks_cluster
     runs-on: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
         if: github.event_name == 'repository_dispatch'
         run: |
           echo "GITHUB_ACTIONS_ROLE_ARN=${{ github.event.client_payload.github_actions_role_arn }}" >> $GITHUB_ENV
- 
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -115,9 +115,52 @@ jobs:
                   groups:
                     - system:bootstrappers
                     - system:nodes
-                # - rolearn: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
-                # username: github-actions
-                # groups:
-                #     - system:masters
+                - rolearn: ${{ env.GITHUB_ACTIONS_ROLE_ARN }}
+                  username: github-actions-bot-for-k8s # a k8s user the IAM role gets map to
+                  groups:
+                      - github-actions-group-for-k8s # it's undefined and it is okay as we are going to use the username in below RBAC configuration.
+              mapUsers: |
+                - userarn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:user/administrator
+                  username: aws-admin-mapped-for-k8s
+                  groups:
+                    - system:masters
+
             EOF
             kubectl apply -f aws-auth-cm.yaml
+
+      - name: Apply RBAC Configuration
+        run: |
+          cat <<EOF >rbac.yaml
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRole
+          metadata:
+            name: github-actions-deployer
+          rules:
+          - apiGroups: [""]
+            resources: ["pods", "services", "endpoints"]
+            verbs: ["get", "list", "watch", "create", "delete", "patch", "update"]
+          - apiGroups: ["apps"]
+            resources: ["deployments", "replicasets"]
+            verbs: ["get", "list", "watch", "create", "delete", "patch", "update"]
+          - apiGroups: ["batch"]
+            resources: ["jobs"]
+            verbs: ["get", "list", "watch", "create", "delete", "patch", "update"]
+          - apiGroups: ["extensions"]
+            resources: ["ingresses"]
+            verbs: ["get", "list", "watch", "create", "delete", "patch", "update"]
+          ---
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRoleBinding
+          metadata:
+            name: github-actions-binding
+          subjects:
+          - kind: User
+            name: github-actions-bot-for-k8s
+            apiGroup: rbac.authorization.k8s.io
+          roleRef:
+            kind: ClusterRole
+            name: github-actions-deployer
+            apiGroup: rbac.authorization.k8s.io
+          EOF
+          kubectl apply -f rbac.yaml
+
