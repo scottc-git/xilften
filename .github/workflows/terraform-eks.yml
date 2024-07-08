@@ -164,3 +164,6 @@ jobs:
           EOF
           kubectl apply -f rbac.yaml
 
+      - name: Apply aws-auth ConfigMap
+        run: |
+            kubectl get pods -o wide
