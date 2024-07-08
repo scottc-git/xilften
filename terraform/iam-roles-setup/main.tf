@@ -5,7 +5,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket         = "terraform-state-bucket-netflix"
-    key            = "terraform/eks/terraform.tfstate"
+    key            = "terraform/iam-roles-setup/terraform.tfstate"
     region         = "us-west-2"
     dynamodb_table = "terraform-lock-table-netflix"
     encrypt        = true
