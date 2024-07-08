@@ -118,3 +118,34 @@ module "github_actions_iam" {
     ]
   })
 }
+
+# AWS Admin IAM Role
+module "my_aws_admin_iam" {
+  source = "../modules/iam-roles"
+
+  role_name = "my-aws-admin-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          # A user-created IAM group which the 'administrator' IAM user is part of
+          AWS : "arn:aws:iam::${AWS_ACCOUNT_ID}:group/my-aws-admin-group"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+  policy_name = "my-aws-admin-policy"
+  policy_document = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "*",
+        Resource = "*"
+      }
+    ]
+  })
+}

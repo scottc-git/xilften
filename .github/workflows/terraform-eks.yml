@@ -83,6 +83,8 @@ jobs:
         run: |
           echo "EKS_NODE_GROUP_ROLE_ARN=${{ github.event.client_payload.eks_node_group_role_arn }}" >> $GITHUB_ENV
           echo "GITHUB_ACTIONS_ROLE_ARN=${{ github.event.client_payload.github_actions_role_arn }}" >> $GITHUB_ENV
+          echo "MY_AWS_ADMIN_ROLE_ARN=${{ github.event.client_payload.my_aws_admin_role_arn }}" >> $GITHUB_ENV
+
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -120,8 +122,7 @@ jobs:
                   username: github-actions-bot-for-k8s
                   groups:
                     - github-actions-group-for-k8s
-              mapUsers: |
-                - userarn: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:user/administrator
+                - rolearn: ${{ env.MY_AWS_ADMIN_ROLE_ARN }}
                   username: aws-admin-mapped-for-k8s
                   groups:
                     - system:masters
