@@ -30,7 +30,7 @@ jobs:
         working-directory: ./terraform/iam-roles-setup
 
       - name: Terraform Apply
-        run: terraform apply -var 'AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID}}' -auto-approve
+        run: terraform apply -auto-approve
         working-directory: ./terraform/iam-roles-setup
 
       - name: Set Outputs and Trigger Dispatch
