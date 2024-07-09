@@ -131,7 +131,7 @@ module "my_aws_admin_iam" {
         Effect = "Allow",
         Principal = {
           # A user-created IAM group which the 'administrator' IAM user is part of
-          AWS : "arn:aws:iam::${var.AWS_ACCOUNT_ID}:group/my-aws-admin-group"
+          AWS = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:group/my-aws-admin-group"
         },
         Action = "sts:AssumeRole"
       }
